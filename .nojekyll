@@ -1,0 +1,4 @@
+# GitHub Pages configuration for serving the static app from /bike-tour-app
+
+# GitHub Pages will build and serve the repository from the selected branch.
+# This file disables Jekyll processing so files/folders beginning with underscores are not ignored.
