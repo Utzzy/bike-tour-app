@@ -1,25 +1,46 @@
-# Fahrradtour Planer
+# 🧭 Fahrradtour Planer
 
-Diese App kann direkt über **GitHub Pages** bereitgestellt werden.
+Eine kleine Progressive Web App (PWA), die zufällige Fahrradtouren plant. Du wählst eine Himmelsrichtung und die gewünschte Dauer – die App berechnet ein Ziel und öffnet die Route in Google Maps.
 
-## GitHub Pages aktivieren
+## Features
 
-1. Öffne **Settings → Pages** im Repository `Utzzy/bike-tour-app`
-2. Wähle bei **Build and deployment**:
-   - **Source:** `Deploy from a branch`
-   - **Branch:** `main`
-   - **Folder:** `/bike-tour-app`
-3. Speichern
-4. Danach ist die App über GitHub Pages erreichbar
+- 🎲 Zufällige oder gezielte Himmelsrichtung
+- ⏱️ Tourdauer von 2 bis 7 Stunden
+- 📍 Automatische Distanzberechnung anhand der Fahrzeit
+- 🗺️ Direktes Öffnen der Route in Google Maps (Fahrradmodus)
+- 📱 Installierbar als PWA mit Offline-Unterstützung
+- 🕒 Verlauf der letzten 10 Touren (lokal gespeichert)
 
-## Struktur
+## Lokal ausführen
 
-Die eigentliche Web-App liegt im Ordner `bike-tour-app/` und ist bereits für relativen Betrieb vorbereitet:
+Da die App einen Service Worker nutzt, sollte sie über einen Webserver (nicht per Doppelklick auf die Datei) geöffnet werden:
 
-- `index.html`
-- `app.js`
-- `manifest.json`
-- `sw.js`
-- `icon.svg`
+```bash
+# Mit Python
+python3 -m http.server 8000
 
-Dadurch funktioniert sie auch unter einem Unterpfad wie GitHub Pages.
+# Oder mit Node
+npx serve
+```
+
+Dann im Browser `http://localhost:8000` öffnen.
+
+## Veröffentlichen mit GitHub Pages
+
+1. Repository auf GitHub anlegen und diesen Ordner pushen.
+2. In den Repository-Einstellungen unter **Settings → Pages** als Quelle den Branch `main` und den Ordner `/ (root)` auswählen.
+3. Nach kurzer Zeit ist die App unter `https://<dein-benutzername>.github.io/<repo-name>/` erreichbar.
+
+> Hinweis: Standort und Service Worker funktionieren nur über HTTPS (oder localhost). GitHub Pages liefert automatisch HTTPS.
+
+## Dateien
+
+- `index.html` – Aufbau und Styling
+- `app.js` – Anwendungslogik
+- `sw.js` – Service Worker für Offline-Nutzung
+- `manifest.json` – PWA-Manifest
+- `icon.svg` – App-Icon
+
+## Lizenz
+
+MIT – siehe [LICENSE](LICENSE).

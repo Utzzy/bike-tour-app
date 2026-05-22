@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Node (falls später ein Build-Tool genutzt wird)
+node_modules/
+npm-debug.log*
+
+# Logs
+*.log
