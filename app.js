@@ -6,6 +6,7 @@ const routingApiUrl = 'https://routing.openstreetmap.de/routed-bike/route/v1/dri
 const averageSpeed = 12;
 const routeFactor = 1.3;
 const maxValidationAttempts = 4;
+const routingRequestTimeoutMs = 8000;
 
 const directions = {
   'Norden': 0,
@@ -113,9 +114,11 @@ function setGenerateButtonLoading(isLoading) {
 
 async function fetchRouteEstimate(start, end) {
   const url = `${routingApiUrl}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false&alternatives=false&steps=false`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), routingRequestTimeoutMs);
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
 
     if (!response.ok) {
       throw new Error(`Routing API Fehler: ${response.status}`);
@@ -135,6 +138,8 @@ async function fetchRouteEstimate(start, end) {
   } catch (error) {
     console.log('Fahrzeit-Prüfung fehlgeschlagen:', error);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -147,7 +152,7 @@ async function generateRoute() {
   const directionSelect = document.getElementById('direction');
   const hoursSelect = document.getElementById('hours');
   const directionValue = directionSelect.value;
-  const hours = parseInt(hoursSelect.value);
+  const hours = parseInt(hoursSelect.value, 10);
 
   const selectedDirection = directionValue === 'random' ? getRandomDirection() : directionValue;
   const bearing = directions[selectedDirection];
