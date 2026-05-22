@@ -113,8 +113,8 @@ function setGenerateButtonLoading(isLoading) {
 }
 
 async function fetchRouteEstimate(start, end) {
-  // Der routed-bike Dienst verwendet den OSRM-Pfad "/driving" trotz Fahrradprofil.
-  // Die API erwartet Koordinaten im Format "lng,lat".
+  // The routed-bike service still uses the OSRM "/driving" path for bike routes.
+  // This API expects coordinates in "lng,lat" order.
   const url = `${routingApiUrl}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false&alternatives=false&steps=false`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), routingRequestTimeoutMs);
@@ -171,7 +171,7 @@ async function generateRoute() {
   setGenerateButtonLoading(true);
 
   try {
-    for (let attempt = 0; attempt < maxValidationAttempts; attempt++) {
+    for (let _attempt = 0; _attempt < maxValidationAttempts; _attempt++) {
       destination = calculateDestination(currentLocation, bearing, distanceKm);
       routeEstimate = await fetchRouteEstimate(currentLocation, destination);
 
@@ -182,6 +182,11 @@ async function generateRoute() {
 
       if (isDurationWithinTolerance(routeEstimate.hours, hours)) {
         validationStatus = 'ok';
+        break;
+      }
+
+      if (routeEstimate.hours <= 0) {
+        validationStatus = 'unknown';
         break;
       }
 
