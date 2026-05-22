@@ -113,6 +113,8 @@ function setGenerateButtonLoading(isLoading) {
 }
 
 async function fetchRouteEstimate(start, end) {
+  // Der routed-bike Dienst verwendet den OSRM-Pfad "/driving" trotz Fahrradprofil.
+  // Die API erwartet Koordinaten im Format "lng,lat".
   const url = `${routingApiUrl}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false&alternatives=false&steps=false`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), routingRequestTimeoutMs);
