@@ -159,7 +159,7 @@ async function generateRoute() {
   let distanceKm = (hours * averageSpeed) / routeFactor;
   let destination = calculateDestination(currentLocation, bearing, distanceKm);
   let routeEstimate = null;
-  let validationStatus = 'warnung';
+  let validationStatus = 'warning';
 
   setGenerateButtonLoading(true);
 
@@ -216,7 +216,7 @@ function displayRoute() {
 
   if (currentRoute.validationStatus === 'ok' && currentRoute.estimatedDurationHours !== null) {
     routeCheck.textContent = `✅ Geprüft: Routing-Schätzung ${currentRoute.estimatedDurationHours.toFixed(1)} h`;
-  } else if (currentRoute.validationStatus === 'warnung' && currentRoute.estimatedDurationHours !== null) {
+  } else if (currentRoute.validationStatus === 'warning' && currentRoute.estimatedDurationHours !== null) {
     const prefix = currentRoute.durationDifferenceMinutes > 0 ? '+' : '';
     routeCheck.textContent = `⚠️ Abweichung erkannt: Routing-Schätzung ${currentRoute.estimatedDurationHours.toFixed(1)} h (${prefix}${currentRoute.durationDifferenceMinutes} Min.)`;
   } else {
