@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="Zufällige Fahrradtouren planen">
+  <title>Fahrradtour Planer</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #eff6ff 0%, #d1fae5 100%);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      color: #1f2937;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    select {
+      padding: 0.75rem;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+    .btn-primary:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .btn-success {
+      background: #16a34a;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+    .btn-install {
+      background: #7c3aed;
+      color: white;
+      margin-top: 1rem;
+    }
+    .btn-install:hover {
+      background: #6d28d9;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .stat-card {
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .stat-card.blue { background: #dbeafe; }
+    .stat-card.green { background: #dcfce7; }
+    .stat-card.purple { background: #f3e8ff; }
+    .stat-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: #1f2937;
+    }
+    .route-details {
+      background: #f9fafb;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: #4b5563;
+    }
+    .history-item {
+      border-left: 4px solid #2563eb;
+      padding: 0.75rem;
+      padding-left: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .history-info {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.25rem;
+    }
+    .history-time {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    .install-banner {
+      background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .install-text {
+      flex: 1;
+    }
+    .install-text strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="installBanner" class="install-banner hidden">
+      <div class="install-text">
+        <strong>📱 App installieren</strong>
+        <span>Installiere die App für schnellen Zugriff und Offline-Nutzung</span>
+      </div>
+      <button onclick="installApp()" class="btn btn-install">Installieren</button>
+    </div>
+
+    <div class="card">
+      <h1>🧭 Zufällige Fahrradtour</h1>
+      <p class="subtitle">Lass den Zufall entscheiden, wohin deine nächste Tour geht!</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="direction">Himmelsrichtung</label>
+          <select id="direction">
+            <option value="random">🎲 Zufällig</option>
+            <option value="Norden">⬆️ Norden</option>
+            <option value="Osten">➡️ Osten</option>
+            <option value="Süden">⬇️ Süden</option>
+            <option value="Westen">⬅️ Westen</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="hours">Stunden</label>
+          <select id="hours">
+            <option value="2">2 Stunden</option>
+            <option value="3" selected>3 Stunden</option>
+            <option value="4">4 Stunden</option>
+            <option value="5">5 Stunden</option>
+            <option value="6">6 Stunden</option>
+            <option value="7">7 Stunden</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="generateBtn" class="btn btn-primary" onclick="generateRoute()">
+        🧭 Route generieren
+      </button>
+    </div>
+
+    <div id="routeCard" class="card hidden">
+      <h2 style="margin-bottom: 1rem; color: #1f2937;">Deine Route</h2>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">🧭 Richtung</div>
+          <div class="stat-value" id="statDirection">-</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">⏱️ Dauer</div>
+          <div class="stat-value" id="statHours">-</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">📍 Distanz</div>
+          <div class="stat-value" id="statDistance">-</div>
+        </div>
+      </div>
+
+      <div class="route-details" id="routeDetails"></div>
+
+      <button class="btn btn-success" onclick="openInMaps()">
+        🗺️ In Google Maps öffnen
+      </button>
+    </div>
+
+    <div id="historyCard" class="card hidden">
+      <h2 style="margin-bottom: 1rem; color: #1f2937;">Verlauf</h2>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
