@@ -278,3 +278,21 @@ function openInMaps() {
     window.open(url, '_blank');
   }
 }
+
+async function resetApp() {
+  if (!confirm('App zurücksetzen? Alle lokalen Daten, Verlauf und Cache werden gelöscht.')) return;
+
+  localStorage.clear();
+
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(reg => reg.unregister()));
+  }
+
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(key => caches.delete(key)));
+  }
+
+  location.replace(location.href);
+}
