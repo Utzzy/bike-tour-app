@@ -280,7 +280,7 @@ function openInMaps() {
 }
 
 async function resetApp() {
-  if (!confirm('App zurücksetzen? Verlauf und Cache werden gelöscht.')) return;
+  if (!confirm('App zurücksetzen? Alle lokalen Daten, Verlauf und Cache werden gelöscht.')) return;
 
   localStorage.clear();
 
@@ -294,5 +294,5 @@ async function resetApp() {
     await Promise.all(keys.map(key => caches.delete(key)));
   }
 
-  location.reload();
+  location.replace(location.href);
 }
