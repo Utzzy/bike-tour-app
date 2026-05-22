@@ -4,7 +4,9 @@ let history = [];
 let deferredPrompt = null;
 const routingApiUrl = 'https://routing.openstreetmap.de/routed-bike/route/v1/driving';
 const averageSpeed = 12;
+// Converts the user's target riding time into an initial straight-line distance estimate.
 const routeFactor = 1.3;
+// Keeps the online validation responsive while still allowing a few correction passes.
 const maxValidationAttempts = 4;
 const routingRequestTimeoutMs = 8000;
 
@@ -171,7 +173,7 @@ async function generateRoute() {
   setGenerateButtonLoading(true);
 
   try {
-    for (let _attempt = 0; _attempt < maxValidationAttempts; _attempt++) {
+    for (let retryAttempt = 0; retryAttempt < maxValidationAttempts; retryAttempt++) {
       destination = calculateDestination(currentLocation, bearing, distanceKm);
       routeEstimate = await fetchRouteEstimate(currentLocation, destination);
 
