@@ -154,12 +154,13 @@ async function generateRoute() {
   }
 
   const directionSelect = document.getElementById('direction');
-  const hoursSelect = document.getElementById('hours');
+  const hoursInput = document.getElementById('hours');
   const directionValue = directionSelect.value;
-  const hours = parseInt(hoursSelect.value, 10);
+  const hoursRaw = hoursInput.value.trim();
+  const hours = Number(hoursRaw);
 
-  if (!Number.isFinite(hours)) {
-    alert('Bitte eine gültige Dauer auswählen.');
+  if (hoursRaw === '' || !Number.isInteger(hours) || hours < 1 || hours > 10) {
+    alert('Bitte eine gültige Dauer zwischen 1 und 10 Stunden eingeben.');
     return;
   }
 

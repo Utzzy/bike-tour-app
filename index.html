@@ -65,14 +65,16 @@
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
     }
-    select {
+    select,
+    input[type="number"] {
       padding: 0.75rem;
       border: 2px solid #d1d5db;
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.2s;
     }
-    select:focus {
+    select:focus,
+    input[type="number"]:focus {
       outline: none;
       border-color: #2563eb;
     }
@@ -209,6 +211,11 @@
     .hidden {
       display: none;
     }
+    .help-text {
+      margin-top: 0.5rem;
+      color: #6b7280;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -239,14 +246,8 @@
 
         <div class="form-group">
           <label for="hours">Stunden</label>
-          <select id="hours">
-            <option value="2">2 Stunden</option>
-            <option value="3" selected>3 Stunden</option>
-            <option value="4">4 Stunden</option>
-            <option value="5">5 Stunden</option>
-            <option value="6">6 Stunden</option>
-            <option value="7">7 Stunden</option>
-          </select>
+          <input id="hours" type="number" min="1" max="10" step="1" value="3" inputmode="numeric" aria-describedby="hoursHelp">
+          <small id="hoursHelp" class="help-text">Bitte eine ganze Zahl von 1 bis 10 eingeben.</small>
         </div>
       </div>
 
