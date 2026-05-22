@@ -117,6 +117,13 @@
     .btn-install:hover {
       background: #6d28d9;
     }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -253,6 +260,9 @@
 
       <button id="generateBtn" class="btn btn-primary" onclick="generateRoute()">
         🧭 Route generieren
+      </button>
+      <button class="btn btn-danger" onclick="resetApp()" style="margin-top: 0.75rem;">
+        🗑️ App zurücksetzen
       </button>
     </div>
 
