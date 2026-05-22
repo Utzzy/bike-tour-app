@@ -154,6 +154,11 @@ async function generateRoute() {
   const directionValue = directionSelect.value;
   const hours = parseInt(hoursSelect.value, 10);
 
+  if (!Number.isFinite(hours)) {
+    alert('Bitte eine gültige Dauer auswählen.');
+    return;
+  }
+
   const selectedDirection = directionValue === 'random' ? getRandomDirection() : directionValue;
   const bearing = directions[selectedDirection];
   let distanceKm = (hours * averageSpeed) / routeFactor;
@@ -169,7 +174,7 @@ async function generateRoute() {
       routeEstimate = await fetchRouteEstimate(currentLocation, destination);
 
       if (!routeEstimate) {
-        validationStatus = 'unbekannt';
+        validationStatus = 'unknown';
         break;
       }
 
@@ -212,7 +217,7 @@ function displayRoute() {
   document.getElementById('statDistance').textContent = currentRoute.distance.toFixed(1) + ' km';
 
   const routeCheck = document.getElementById('routeCheck');
-  routeCheck.className = `route-check ${currentRoute.validationStatus || 'unbekannt'}`;
+  routeCheck.className = `route-check ${currentRoute.validationStatus || 'unknown'}`;
 
   if (currentRoute.validationStatus === 'ok' && currentRoute.estimatedDurationHours !== null) {
     routeCheck.textContent = `✅ Geprüft: Routing-Schätzung ${currentRoute.estimatedDurationHours.toFixed(1)} h`;
