@@ -156,9 +156,10 @@ async function generateRoute() {
   const directionSelect = document.getElementById('direction');
   const hoursInput = document.getElementById('hours');
   const directionValue = directionSelect.value;
-  const hours = Number(hoursInput.value);
+  const hoursRaw = hoursInput.value.trim();
+  const hours = Number(hoursRaw);
 
-  if (!Number.isInteger(hours) || hours < 1 || hours > 10) {
+  if (hoursRaw === '' || !Number.isInteger(hours) || hours < 1 || hours > 10) {
     alert('Bitte eine gültige Dauer zwischen 1 und 10 Stunden eingeben.');
     return;
   }
