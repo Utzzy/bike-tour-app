@@ -7,6 +7,7 @@ Eine kleine Progressive Web App (PWA), die zufällige Fahrradtouren plant. Du w�
 - 🎲 Zufällige oder gezielte Himmelsrichtung
 - ⏱️ Tourdauer von 2 bis 7 Stunden
 - 📍 Automatische Distanzberechnung anhand der Fahrzeit
+- ✅ Online-Prüfung der berechneten Fahrzeit gegen eine Fahrrad-Routing-Schätzung
 - 🗺️ Direktes Öffnen der Route in Google Maps (Fahrradmodus)
 - 📱 Installierbar als PWA mit Offline-Unterstützung
 - 🕒 Verlauf der letzten 10 Touren (lokal gespeichert)

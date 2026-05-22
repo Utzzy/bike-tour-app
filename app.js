@@ -2,6 +2,10 @@ let currentLocation = null;
 let currentRoute = null;
 let history = [];
 let deferredPrompt = null;
+const routingApiUrl = 'https://routing.openstreetmap.de/routed-bike/route/v1/driving';
+const averageSpeed = 12;
+const routeFactor = 1.3;
+const maxValidationAttempts = 4;
 
 const directions = {
   'Norden': 0,
@@ -93,7 +97,48 @@ function calculateDestination(start, bearing, distanceKm) {
   };
 }
 
-function generateRoute() {
+function getDurationToleranceHours(hours) {
+  return Math.max(0.25, hours * 0.15);
+}
+
+function isDurationWithinTolerance(actualHours, targetHours) {
+  return Math.abs(actualHours - targetHours) <= getDurationToleranceHours(targetHours);
+}
+
+function setGenerateButtonLoading(isLoading) {
+  const button = document.getElementById('generateBtn');
+  button.disabled = isLoading;
+  button.textContent = isLoading ? '⏳ Route wird geprüft...' : '🧭 Route generieren';
+}
+
+async function fetchRouteEstimate(start, end) {
+  const url = `${routingApiUrl}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false&alternatives=false&steps=false`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Routing API Fehler: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const route = data.routes && data.routes[0];
+
+    if (!route || typeof route.duration !== 'number' || typeof route.distance !== 'number') {
+      throw new Error('Keine Routing-Daten verfügbar');
+    }
+
+    return {
+      hours: route.duration / 3600,
+      distanceKm: route.distance / 1000
+    };
+  } catch (error) {
+    console.log('Fahrzeit-Prüfung fehlgeschlagen:', error);
+    return null;
+  }
+}
+
+async function generateRoute() {
   if (!currentLocation) {
     alert('Standort wird noch ermittelt...');
     return;
@@ -106,23 +151,53 @@ function generateRoute() {
 
   const selectedDirection = directionValue === 'random' ? getRandomDirection() : directionValue;
   const bearing = directions[selectedDirection];
-  const averageSpeed = 12;
-  const routeFactor = 1.3;
-  const distanceKm = (hours * averageSpeed) / routeFactor;
+  let distanceKm = (hours * averageSpeed) / routeFactor;
+  let destination = calculateDestination(currentLocation, bearing, distanceKm);
+  let routeEstimate = null;
+  let validationStatus = 'warnung';
 
-  const destination = calculateDestination(currentLocation, bearing, distanceKm);
+  setGenerateButtonLoading(true);
 
-  currentRoute = {
-    start: currentLocation,
-    end: destination,
-    direction: selectedDirection,
-    hours: hours,
-    distance: distanceKm,
-    timestamp: new Date().toLocaleString('de-DE')
-  };
+  try {
+    for (let attempt = 0; attempt < maxValidationAttempts; attempt++) {
+      destination = calculateDestination(currentLocation, bearing, distanceKm);
+      routeEstimate = await fetchRouteEstimate(currentLocation, destination);
 
-  displayRoute();
-  addToHistory(currentRoute);
+      if (!routeEstimate) {
+        validationStatus = 'unbekannt';
+        break;
+      }
+
+      if (isDurationWithinTolerance(routeEstimate.hours, hours)) {
+        validationStatus = 'ok';
+        break;
+      }
+
+      distanceKm *= hours / routeEstimate.hours;
+    }
+
+    const durationDifferenceMinutes = routeEstimate
+      ? Math.round((routeEstimate.hours - hours) * 60)
+      : null;
+
+    currentRoute = {
+      start: currentLocation,
+      end: destination,
+      direction: selectedDirection,
+      hours: hours,
+      distance: distanceKm,
+      estimatedDurationHours: routeEstimate ? routeEstimate.hours : null,
+      estimatedDistanceKm: routeEstimate ? routeEstimate.distanceKm : null,
+      durationDifferenceMinutes,
+      validationStatus,
+      timestamp: new Date().toLocaleString('de-DE')
+    };
+
+    displayRoute();
+    addToHistory(currentRoute);
+  } finally {
+    setGenerateButtonLoading(false);
+  }
 }
 
 function displayRoute() {
@@ -131,9 +206,22 @@ function displayRoute() {
   document.getElementById('statHours').textContent = currentRoute.hours + 'h';
   document.getElementById('statDistance').textContent = currentRoute.distance.toFixed(1) + ' km';
 
+  const routeCheck = document.getElementById('routeCheck');
+  routeCheck.className = `route-check ${currentRoute.validationStatus || 'unbekannt'}`;
+
+  if (currentRoute.validationStatus === 'ok' && currentRoute.estimatedDurationHours !== null) {
+    routeCheck.textContent = `✅ Geprüft: Routing-Schätzung ${currentRoute.estimatedDurationHours.toFixed(1)} h`;
+  } else if (currentRoute.validationStatus === 'warnung' && currentRoute.estimatedDurationHours !== null) {
+    const prefix = currentRoute.durationDifferenceMinutes > 0 ? '+' : '';
+    routeCheck.textContent = `⚠️ Abweichung erkannt: Routing-Schätzung ${currentRoute.estimatedDurationHours.toFixed(1)} h (${prefix}${currentRoute.durationDifferenceMinutes} Min.)`;
+  } else {
+    routeCheck.textContent = 'ℹ️ Fahrzeit konnte nicht online geprüft werden. Distanz bleibt eine Näherung.';
+  }
+
   document.getElementById('routeDetails').innerHTML = `
     <strong>Start:</strong> ${currentRoute.start.lat.toFixed(5)}, ${currentRoute.start.lng.toFixed(5)}<br>
-    <strong>Ziel:</strong> ${currentRoute.end.lat.toFixed(5)}, ${currentRoute.end.lng.toFixed(5)}
+    <strong>Ziel:</strong> ${currentRoute.end.lat.toFixed(5)}, ${currentRoute.end.lng.toFixed(5)}<br>
+    <strong>Routing-Distanz:</strong> ${currentRoute.estimatedDistanceKm !== null ? `${currentRoute.estimatedDistanceKm.toFixed(1)} km` : 'nicht verfügbar'}
   `;
 }
 
